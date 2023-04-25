@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DALL-E Image Generator</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  </head>
+  <body>
+    <div class="container">
+      <h1>DALL-E Image Generator</h1>
+      <form id="dalle-form">
+        <div class="form-group">
+          <label for="dalle-prompt">Enter your DALL-E prompt:</label>
+          <textarea class="form-control" id="dalle-prompt" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="api-key">Enter your OpenAI API key:</label>
+          <input type="text" class="form-control" id="api-key">
+        </div>
+        <button type="submit" class="btn btn-primary">Generate Images</button>
+      </form>
+      <div id="dalle-images" class="mt-4"></div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script>
+      $('#dalle-form').submit(function(event) {
+        event.preventDefault();
+        var prompt = $('#dalle-prompt').val();
+        var apiKey = $('#api-key').val();
+        axios.post('https://api.openai.com/v1/images/generations', {
+          "model": "image-alpha-001",
+          "prompt": prompt,
+          "num_images": 4,
+          "size": "256x256",
+          "response_format": "url"
+        }, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + apiKey
+          }
+        })
+        .then(function(response) {
+          var images = '';
+          response.data.data.forEach(function(image) {
+            images += '<img src="' + image.url + '">';
+          });
+          $('#dalle-images').html(images);
+        })
+        .catch(function(error) {
+          console.log(error.response.data);
+        });
+      });
+    </script>
+  </body>
+</html>
