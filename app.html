@@ -2,7 +2,10 @@
 <html>
   <head>
     <title>DALL-E Image Generator</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    />
   </head>
   <body>
     <div class="container">
@@ -14,44 +17,68 @@
         </div>
         <div class="form-group">
           <label for="api-key">Enter your OpenAI API key:</label>
-          <input type="text" class="form-control" id="api-key">
+          <input type="text" class="form-control" id="api-key" />
+        </div>
+        <div class="form-group">
+          <label for="image-size">Image Size:</label>
+          <select class="form-control" id="image-size">
+            <option value="256x256">256x256</option>
+            <option value="512x512">512x512</option>
+            <option value="1024x1024">1024x1024</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="image-number">Numbers of image:</label>
+          <select class="form-control" id="image-num">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+          </select>
         </div>
         <button type="submit" class="btn btn-primary">Generate Images</button>
       </form>
       <div id="dalle-images" class="mt-4"></div>
     </div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <script>
-      $('#dalle-form').submit(function(event) {
+      $("#dalle-form").submit(function (event) {
         event.preventDefault();
-        var prompt = $('#dalle-prompt').val();
-        var apiKey = $('#api-key').val();
-        axios.post('https://api.openai.com/v1/images/generations', {
-          "model": "image-alpha-001",
-          "prompt": prompt,
-          "num_images": 4,
-          "size": "256x256",
-          "response_format": "url"
-        }, {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + apiKey
-          }
-        })
-        .then(function(response) {
-          var images = '';
-          response.data.data.forEach(function(image) {
-            images += '<img src="' + image.url + '">';
+        var num = parseInt($("#image-num").val());
+        var size = $("#image-size").val();
+        var prompt = $("#dalle-prompt").val();
+        var apiKey = $("#api-key").val();
+        axios
+          .post(
+            "https://api.openai.com/v1/images/generations",
+            {
+              model: "image-alpha-001",
+              prompt: prompt,
+              num_images: num,
+              size: size,
+              response_format: "url",
+            },
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + apiKey,
+              },
+            }
+          )
+          .then(function (response) {
+            var images = "";
+            response.data.data.forEach(function (image) {
+              images += '<img src="' + image.url + '">';
+            });
+            $("#dalle-images").html(images);
+          })
+          .catch(function (error) {
+            console.log(error.response.data);
           });
-          $('#dalle-images').html(images);
-        })
-        .catch(function(error) {
-          console.log(error.response.data);
-        });
       });
     </script>
   </body>
